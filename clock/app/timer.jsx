@@ -1,9 +1,9 @@
 import { View, Text } from 'react-native';
 
-export default function Alarme() {
+export default function Timer() {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Alarme</Text>
+      <Text>Timer</Text>
     </View>
   );
 }

@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+
 
 export default function Cronometro() {
   const [isRunning, setIsRunning] = useState(false);
@@ -48,20 +51,21 @@ export default function Cronometro() {
 
   return (
     <View style={s.container}>
-      <View style={s.stopwatch}>
+      <Text style={s.title}>Cronômetro</Text>
+      <View style={s.cronometro}>
         <Text style={s.display}>{formatTime()}</Text>
 
         <View style={s.controls}>
-          <TouchableOpacity style={[s.button, s.start]} onPress={start}>
-            <Text style={s.buttonText}>Start</Text>
+          <TouchableOpacity style={[s.button]} onPress={start}>
+            <MaterialIcons name="play-arrow" size={48} color="#ACC1D3" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[s.button, s.stop]} onPress={stop}>
-            <Text style={s.buttonText}>Stop</Text>
+          <TouchableOpacity style={[s.button]} onPress={stop}>
+            <FontAwesome6 name="stop" size={32} color="#ACC1D3" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[s.button, s.reset]} onPress={reset}>
-            <Text style={s.buttonText}>Reset</Text>
+          <TouchableOpacity style={[s.button]} onPress={reset}>
+            <FontAwesome6 name="arrow-rotate-right" size={32} color="#ACC1D3" />
           </TouchableOpacity>
         </View>
       </View>
@@ -70,32 +74,44 @@ export default function Cronometro() {
 }
 
 const s = StyleSheet.create({
+
   container: {
-    
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#1A3953'
   },
-  stopwatch: {
-    
+  title: {
+    color: '#ACC1D3',
+    fontSize: 40,
+    marginBottom: 120, 
+    letterSpacing: 1,
+  },
+  cronometro: {
+    alignItems: 'center',
+    width: '100%'
   },
   display: {
-    
+    color: '#ACC1D3',
+    fontSize: 50,
+    fontWeight: '500',
+    letterSpacing: 2,
+    marginBottom: 80,
+    fontVariant: ['tabular-nums'],
+    letterSpacing: 3,
   },
   controls: {
-
+    flexDirection: 'row',
+    gap: 20,
+    marginTop: 20
   },
   button: {
-
+    width: 110,
+    height: 60,
+    borderRadius: 25,
+    backgroundColor: '#3D5F7E',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  start: {
-
-  },
-  buttonText: {
-
-  },
-  stop: {
-
-  },
-  reset: {
-
-  }
   
 });
