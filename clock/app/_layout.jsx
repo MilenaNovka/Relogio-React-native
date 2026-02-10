@@ -7,12 +7,26 @@ export default function Layout() {
     <Tabs
       screenOptions={{
         headerShown: false, // remove o header
+        tabBarActiveTintColor: '#FFF',
+        tabBarInactiveTintColor: '#ACC1D3',
+        
+        tabBarStyle: {
+          backgroundColor: '#132A3D',
+          height: 70,
+          fontSize: 20,
+          borderTopWidth: 0, // linha
+        },
+        tabBarLabelStyle: { // texto
+          fontSize: 12,           
+          fontWeight: 'bold',     
+          marginBottom: 5,        
+        },
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="index" // arquivo
         options={{
-          title: 'Alarme',
+          title: 'Alarme', // titulo
           tabBarIcon: () => (
             <View style={styles.iconContainer}>
               <MaterialIcons name="alarm" style={styles.icon} />
@@ -42,16 +56,24 @@ export default function Layout() {
           ),
         }}
       />
+      {/* esconder o botão para addAlarm */}
+      <Tabs.Screen 
+        name="addAlarm" 
+        options={{ 
+          href: null, 
+          tabBarStyle: { display: 'none' }
+        }} 
+      />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
   iconContainer: {
-    backgroundColor: '#f0f0f0', 
+    backgroundColor: '#3D5F7E', 
     padding: 8,
     borderRadius: 12,
-    marginBottom: 20
+    marginBottom: 30
   },
   icon: {
     color: '#ACC1D3', 

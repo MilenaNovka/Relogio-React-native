@@ -23,16 +23,16 @@ export default function Cronometro() {
     };
   }, [isRunning]);
 
-  function start() {
+  function Start() {
     setIsRunning(true);
     startTimeRef.current = Date.now() - elapsedTime;
   }
 
-  function stop() {
+  function Stop() {
     setIsRunning(false);
   }
 
-  function reset() {
+  function Reset() {
     setElapsedTime(0);
     setIsRunning(false);
   }
@@ -56,17 +56,23 @@ export default function Cronometro() {
         <Text style={s.display}>{formatTime()}</Text>
 
         <View style={s.controls}>
-          <TouchableOpacity style={[s.button]} onPress={start}>
-            <MaterialIcons name="play-arrow" size={48} color="#ACC1D3" />
+          {/* Reset */}
+          <TouchableOpacity style={s.button} onPress={Reset}>
+            <FontAwesome6 name="arrow-rotate-right" size={28} color="#ACC1D3" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[s.button]} onPress={stop}>
-            <FontAwesome6 name="stop" size={32} color="#ACC1D3" />
+          {/* Play/Pause */}
+          <TouchableOpacity 
+            style={s.button} 
+            onPress={isRunning ? Stop : Start}
+          > 
+            <MaterialIcons 
+              name={isRunning ? "pause" : "play-arrow"} 
+              size={48} 
+              color="#ACC1D3" 
+            />
           </TouchableOpacity>
 
-          <TouchableOpacity style={[s.button]} onPress={reset}>
-            <FontAwesome6 name="arrow-rotate-right" size={32} color="#ACC1D3" />
-          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -95,7 +101,6 @@ const s = StyleSheet.create({
     color: '#ACC1D3',
     fontSize: 50,
     fontWeight: '500',
-    letterSpacing: 2,
     marginBottom: 80,
     fontVariant: ['tabular-nums'],
     letterSpacing: 3,
