@@ -1,86 +1,104 @@
 import { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import Modal from 'react-native-modal';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { MaterialIcons } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 export default function Timer() {
-
-  const [h, setH] = useState("00"); // Hora
-  const [m, setM] = useState("00"); // Minuto
-  const [s, setS] = useState("10"); // Segundo
+  const [h, setH] = useState("00"); // hora
+  const [m, setM] = useState("00"); // minuto
+  const [s, setS] = useState("10"); // segundo
 
   const [isRunning, setIsRunning] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10000); 
+  const [timeLeft, setTimeLeft] = useState(10); 
   const [iniciar, setIniciar] = useState(0);
 
-  const getTotalSeconds = () => { // serve para transformar o tempo em segundos
-    return (parseInt(h || 0) * 3600) + (parseInt(m || 0) * 60) + parseInt(s || 0); // o 0 serve para não ser "copiado" como tmepo
-  };//                 1hr tem 3600s                1m tem 60s          
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const toggleModal = () => {
+    setModalVisible(!isModalVisible);
+  };
+
+  const getTotalSeconds = () => { // transforma o tempo em segundos
+    return (parseInt(h || 0) * 3600) + (parseInt(m || 0) * 60) + parseInt(s || 0);
+  };
 
   useEffect(() => {
     let timer;
-    if (isRunning && timeLeft > 0) { // verifica para iniciar a rodar
+    if (isRunning && timeLeft > 0) { // se tiver tempo, ele roda
       timer = setInterval(() => {
-        setTimeLeft((prev) => Math.max(prev - 1000, 0)); // diminui 1000ms do numero anterior a cada 1000ms
+        setTimeLeft((prev) => prev - 1); // Subtrai 1 segundo por vez
       }, 1000);
-    } else if (timeLeft === 0 && isRunning) { // para a contagem
-      Reset();
+    } else if (timeLeft === 0 && isRunning) { // se não tiver tempo, ele não roda
+      setIsRunning(false);  // para o timer
+      setModalVisible(true); // ativa o aviso de termino do tempo
     }
     return () => clearInterval(timer);
   }, [isRunning, timeLeft]);
 
-  // calcula os valores para milissegundos
   const syncTime = () => {
     const total = getTotalSeconds();
-    setTimeLeft(total * 1000); // multiplica 1000 para trabalhar em milissegundos
-    setIniciar(prev => prev + 1); // reiniciar o circulo
+    setTimeLeft(total); // Sincroniza o valor em segundos
+    setIniciar(prev => prev + 1); // inicia o circulo
   };
 
-  const Start = () => {
-    if (getTotalSeconds() === 0) return; // em cado do timer zerado
+  const Start = () => { // inicia
+    if (getTotalSeconds() === 0) return;
     syncTime(); 
     setIsRunning(true);
   };
 
   const Pause = () => setIsRunning(false); // pausa
 
-  const Reset = () => {
-    setIsRunning(false); // pausa
-    syncTime();          // reinicia para o tempo calculado inicial
+  const Reset = () => { // reinicia
+    setIsRunning(false);
+    syncTime();
   };
 
-  // monta os valores para suas formas originais (em segundos)
-  const displayH = Math.floor(timeLeft / 3600000);
-  const displayM = Math.floor((timeLeft % 3600000) / 60000);
-  const displayS = Math.ceil((timeLeft % 60000) / 1000);
+  // transforma nos valores originais
+  const displayH = Math.floor(timeLeft / 3600);
+  const displayM = Math.floor((timeLeft % 3600) / 60);
+  const displayS = timeLeft % 60;
 
-  // serve para mostrar os numeros singulares com 0
   const format = (num) => num.toString().padStart(2, '0');
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Timer</Text>
       
+        <Modal 
+        isVisible={isModalVisible}
+        //animationIn={"bounce"}
+        >
+        <View style={styles.modalOverlay}> 
+          <View style={styles.esgotado}>
+            <Text style={styles.alertMsg}>Tempo esgotado</Text>
+            <TouchableOpacity style={styles.buttonModal} onPress={toggleModal}>
+              <Text style={styles.buttonText}>Dispensar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        </Modal>
+
       <View style={styles.tempo}>
         <CountdownCircleTimer
           key={iniciar}
           isPlaying={isRunning}
           duration={getTotalSeconds()}
-          initialRemainingTime={timeLeft / 1000}
+          initialRemainingTime={timeLeft} 
           colors={['#004777', '#F7B801', '#A30000', '#A30000']}
           colorsTime={[
             getTotalSeconds(),          
-            getTotalSeconds()/3*2 ,    
-            getTotalSeconds()/3 ,    
+            getTotalSeconds()/3*2,    
+            getTotalSeconds()/3,    
             0                      
           ]} 
           size={280}
           strokeWidth={10}
         >
-          {() => ( // para o circulo
+          {() => (
             <View style={styles.containerTotal}>
-              {/* HORA */}
               <TextInput
                 style={styles.timerInput}
                 value={isRunning ? format(displayH) : h}
@@ -88,10 +106,8 @@ export default function Timer() {
                 keyboardType="numeric"
                 maxLength={2}
                 editable={!isRunning}
-                selectTextOnFocus
               />
-              <Text style={styles.separator}>:</Text>
-              {/* MINUTO */}
+              <Text style={styles.ponto}>:</Text>
               <TextInput
                 style={styles.timerInput}
                 value={isRunning ? format(displayM) : m}
@@ -99,10 +115,8 @@ export default function Timer() {
                 keyboardType="numeric"
                 maxLength={2}
                 editable={!isRunning}
-                selectTextOnFocus
               />
-              <Text style={styles.separator}>:</Text>
-              {/* SEGUNDO */}
+              <Text style={styles.ponto}>:</Text>
               <TextInput
                 style={styles.timerInput}
                 value={isRunning ? format(displayS) : s}
@@ -110,17 +124,15 @@ export default function Timer() {
                 keyboardType="numeric"
                 maxLength={2}
                 editable={!isRunning}
-                selectTextOnFocus
               />
             </View>
           )}
         </CountdownCircleTimer>
+        
         <View style={styles.controls}>
-          {/* Reset */}
           <TouchableOpacity style={styles.button} onPress={Reset}>
             <FontAwesome6 name="arrow-rotate-right" size={24} color="#ACC1D3" />
           </TouchableOpacity>
-          {/* play e pause */}
           <TouchableOpacity style={styles.button} onPress={isRunning ? Pause : Start}> 
             <MaterialIcons name={isRunning ? "pause" : "play-arrow"} size={45} color="#ACC1D3" />
           </TouchableOpacity>
@@ -139,16 +151,16 @@ const styles = StyleSheet.create({
   },
   title: { 
     color: '#ACC1D3', 
-    fontSize: 32,
+    fontSize: 32, 
     marginBottom: 50 
   },
-  tempo: {
+  tempo: { 
     alignItems: 'center' 
   },
   containerTotal: { 
     flexDirection: 'row', 
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'center', 
+    justifyContent: 'center', 
     width: '100%' 
   },
   timerInput: { 
@@ -156,12 +168,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', 
     color: '#ACC1D3', 
     textAlign: 'center',
-    width: 65, 
-  },
-  separator: { 
+    width: 65 
+    },
+  ponto: { 
     fontSize: 35, 
     color: '#ACC1D3', 
-    fontWeight: 'bold',
+    fontWeight: 'bold', 
     paddingBottom: 5 
   },
   controls: { 
@@ -177,4 +189,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center' 
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  esgotado: {
+    width: '80%',
+    backgroundColor: '#ACC1D3',
+    padding: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  alertMsg: {
+    color: '#1A3953' ,
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  buttonModal: {
+    width: '20%',
+    padding: 8,
+    backgroundColor: '#1A3953',
+    alignItems: 'center',
+    borderRadius: 25,
+    marginTop: 10
+  },
+  buttonText: {
+    color: '#ACC1D3',
+    fontWeight: 'bold'
+  }
 });
