@@ -4,6 +4,7 @@ import Modal from 'react-native-modal';
 import { CountdownCircleTimer } from 'react-countdown-circle-timer';
 import { MaterialIcons } from '@expo/vector-icons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import { useAudioPlayer } from 'expo-audio';
 
 export default function Timer() {
   const [h, setH] = useState("00"); // hora
@@ -16,9 +17,23 @@ export default function Timer() {
 
   const [isModalVisible, setModalVisible] = useState(false); // controla o modal
 
-  const toggleModal = () => { // func para controlar se o modal aparece ou não
-    setModalVisible(!isModalVisible);
+  const player = useAudioPlayer(require('../assets/sounds/alarm.mp3')) // som do alarme
+  if (player) { // usar o som em loop
+    player.loop = true;
+  }
+
+  const alert = () => { // func para controlar se o modal aparece ou não
+    setModalVisible(true);
+    player.play();
   };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    if (player) {
+      player.pause(); 
+     player.seekTo(0); // Volta o som para o inicio para a próxima vez
+    }
+  }
 
   const getTotalSeconds = () => { // transforma horas, minutos e segundos em segundos totais
     return (parseInt(h || 0) * 3600) + (parseInt(m || 0) * 60) + parseInt(s || 0); // parseInt para transformar string em in
@@ -32,7 +47,7 @@ export default function Timer() {
       }, 1000);
     } else if (timeLeft === 0 && isRunning) { // se não tiver tempo
       setIsRunning(false);  // para o timer
-      setModalVisible(true); // ativa o aviso de termino do tempo
+      alert() // ativa o aviso de termino do tempo
     }
     return () => clearInterval(timer); // Limpa o intervalo anterior antes de criar outro, evitando múltiplos timers rodando ao mesmo tempo
   }, [isRunning, timeLeft]);
@@ -69,12 +84,12 @@ export default function Timer() {
       
         <Modal 
         isVisible={isModalVisible}
-        //animationIn={"bounce"}
+        animationIn={"zoomIn"}
         >
         <View style={styles.modalOverlay}> 
           <View style={styles.esgotado}>
             <Text style={styles.alertMsg}>Tempo esgotado</Text>
-            <TouchableOpacity style={styles.buttonModal} onPress={toggleModal}>
+            <TouchableOpacity style={styles.buttonModal} onPress={closeModal}>
               <Text style={styles.buttonText}>Dispensar</Text>
             </TouchableOpacity>
           </View>
@@ -199,16 +214,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#ACC1D3',
     padding: 30,
     borderRadius: 25,
-    alignItems: 'center',
+    alignItems: 'center'
   },
   alertMsg: {
     color: '#1A3953' ,
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
+    textAlign: 'center'
   },
   buttonModal: {
-    width: '20%',
+    width: '35%',
     padding: 8,
     backgroundColor: '#1A3953',
     alignItems: 'center',

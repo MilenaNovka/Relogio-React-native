@@ -14,7 +14,7 @@ export default function Cronometro() {
   useEffect(() => {
     if (isRunning) {
       intervalIdRef.current = setInterval(() => {
-        setElapsedTime(Date.now() - startTimeRef.current); // A cada 10ms, tempo atual - tempo que começou
+        setElapsedTime(Date.now() - startTimeRef.current); // A cada 10ms = tempo atual - tempo que começou
       }, 10);//        Date.now já traz o tempo em milissegundos
     }
     return () => {
