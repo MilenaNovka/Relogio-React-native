@@ -5,43 +5,42 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 
 
 export default function Cronometro() {
-  const [isRunning, setIsRunning] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(false); // controla o conometro
+  const [elapsedTime, setElapsedTime] = useState(0); // guarda o tempo decorrido, começa em 0
 
   const intervalIdRef = useRef(null);
-  const startTimeRef = useRef(0);
+  const startTimeRef = useRef(0); // guarda o momento que o cronometro iniciou
 
   useEffect(() => {
     if (isRunning) {
       intervalIdRef.current = setInterval(() => {
-        setElapsedTime(Date.now() - startTimeRef.current);
-      }, 10);
+        setElapsedTime(Date.now() - startTimeRef.current); // A cada 10ms, tempo atual - tempo que começou
+      }, 10);//        Date.now já traz o tempo em milissegundos
     }
-
     return () => {
       clearInterval(intervalIdRef.current);
     };
   }, [isRunning]);
 
-  function Start() {
+  function Start() { // inicia
     setIsRunning(true);
-    startTimeRef.current = Date.now() - elapsedTime;
+    startTimeRef.current = Date.now() - elapsedTime; //Define o ponto inicial considerando o tempo já decorrido
   }
 
-  function Stop() {
+  function Stop() { // pausa/para
     setIsRunning(false);
   }
 
-  function Reset() {
+  function Reset() { //reinicia
     setElapsedTime(0);
     setIsRunning(false);
   }
 
-  function formatTime() {
+  function formatTime() { // transforma os milissegundos
     let minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
     let seconds = Math.floor((elapsedTime / 1000) % 60);
     let milliseconds = Math.floor((elapsedTime % 1000) / 10);
-
+    // coloca 0
     minutes = String(minutes).padStart(2, '0');
     seconds = String(seconds).padStart(2, '0');
     milliseconds = String(milliseconds).padStart(2, '0');

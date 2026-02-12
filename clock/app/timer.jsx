@@ -10,34 +10,34 @@ export default function Timer() {
   const [m, setM] = useState("00"); // minuto
   const [s, setS] = useState("10"); // segundo
 
-  const [isRunning, setIsRunning] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(10); 
-  const [iniciar, setIniciar] = useState(0);
+  const [isRunning, setIsRunning] = useState(false); // controla o timer
+  const [timeLeft, setTimeLeft] = useState(10); // guarda o tempo restante, usado na subtração
+  const [iniciar, setIniciar] = useState(0); // controla o circulo
 
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false); // controla o modal
 
-  const toggleModal = () => {
+  const toggleModal = () => { // func para controlar se o modal aparece ou não
     setModalVisible(!isModalVisible);
   };
 
-  const getTotalSeconds = () => { // transforma o tempo em segundos
-    return (parseInt(h || 0) * 3600) + (parseInt(m || 0) * 60) + parseInt(s || 0);
-  };
+  const getTotalSeconds = () => { // transforma horas, minutos e segundos em segundos totais
+    return (parseInt(h || 0) * 3600) + (parseInt(m || 0) * 60) + parseInt(s || 0); // parseInt para transformar string em in
+  };//                    1h = 3600s                  1m = 60s
 
   useEffect(() => {
     let timer;
-    if (isRunning && timeLeft > 0) { // se tiver tempo, ele roda
+    if (isRunning && timeLeft > 0) { // se tiver tempo
       timer = setInterval(() => {
         setTimeLeft((prev) => prev - 1); // Subtrai 1 segundo por vez
       }, 1000);
-    } else if (timeLeft === 0 && isRunning) { // se não tiver tempo, ele não roda
+    } else if (timeLeft === 0 && isRunning) { // se não tiver tempo
       setIsRunning(false);  // para o timer
       setModalVisible(true); // ativa o aviso de termino do tempo
     }
-    return () => clearInterval(timer);
+    return () => clearInterval(timer); // Limpa o intervalo anterior antes de criar outro, evitando múltiplos timers rodando ao mesmo tempo
   }, [isRunning, timeLeft]);
 
-  const syncTime = () => {
+  const syncTime = () => { // sincroniza o tempo digitado com o timer real e reinicia o círculo
     const total = getTotalSeconds();
     setTimeLeft(total); // Sincroniza o valor em segundos
     setIniciar(prev => prev + 1); // inicia o circulo
@@ -52,8 +52,8 @@ export default function Timer() {
   const Pause = () => setIsRunning(false); // pausa
 
   const Reset = () => { // reinicia
-    setIsRunning(false);
-    syncTime();
+    setIsRunning(false); // para o timer
+    syncTime(); // reinicia o tempo
   };
 
   // transforma nos valores originais
@@ -61,7 +61,7 @@ export default function Timer() {
   const displayM = Math.floor((timeLeft % 3600) / 60);
   const displayS = timeLeft % 60;
 
-  const format = (num) => num.toString().padStart(2, '0');
+  const format = (num) => num.toString().padStart(2, '0'); // para dois digitos
 
   return (
     <View style={styles.container}>
