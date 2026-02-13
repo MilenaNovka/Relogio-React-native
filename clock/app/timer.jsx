@@ -78,6 +78,19 @@ export default function Timer() {
 
   const format = (num) => num.toString().padStart(2, '0'); // para dois digitos
 
+  const removedor = (texto, set, max) => {
+    let cleanText = texto.replace(/\D/g, ''); // Remove qualquer coisa que não seja 0-9
+     if (cleanText === '') {
+      set(''); // Permite apagar tudo
+      return;
+    }
+    const numValue = parseInt(cleanText, 10); // transforma em numero para ver o limite
+    if (numValue > max) {
+      cleanText = max.toString();
+    }
+    set(cleanText);
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Timer</Text>
@@ -117,7 +130,7 @@ export default function Timer() {
               <TextInput
                 style={styles.timerInput}
                 value={isRunning ? format(displayH) : h}
-                onChangeText={setH}
+                onChangeText={(texto) => removedor(texto, setH, 99)}
                 keyboardType="numeric"
                 maxLength={2}
                 editable={!isRunning}
@@ -126,7 +139,7 @@ export default function Timer() {
               <TextInput
                 style={styles.timerInput}
                 value={isRunning ? format(displayM) : m}
-                onChangeText={setM}
+                onChangeText={(texto) => removedor(texto, setM, 59)}
                 keyboardType="numeric"
                 maxLength={2}
                 editable={!isRunning}
@@ -135,7 +148,7 @@ export default function Timer() {
               <TextInput
                 style={styles.timerInput}
                 value={isRunning ? format(displayS) : s}
-                onChangeText={setS}
+                onChangeText={(texto) => removedor(texto, setS, 59)}
                 keyboardType="numeric"
                 maxLength={2}
                 editable={!isRunning}

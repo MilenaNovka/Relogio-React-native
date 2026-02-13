@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { ScrollView, SafeAreaView, TouchableOpacity, Text, View, StyleSheet, TextInput} from "react-native";
+import { useRouter } from "expo-router";
 
-export default function Home(){
+
+export default function addAlarm(){
+
+    const router = useRouter();
 
     const [hora, setHora] = useState(null);
     const [minuto, setMinuto] = useState(null);
+    const [nomeAlarme, setnomeAlarme] = useState(null);
     const [dias, setDias] = useState([
         {id:1, letra:'D',abreviacao:'Dom', selecionado: false},
         {id:2, letra:'S',abreviacao:'Seg', selecionado: false},
@@ -14,6 +19,14 @@ export default function Home(){
         {id:6, letra:'S',abreviacao:'Sex', selecionado: false},
         {id:7, letra:'S',abreviacao:'Sab', selecionado: false}
     ])
+    const diasMarc = dias.filter(dia => dia.selecionado === true).map(dia => dia.abreviacao);
+
+
+    function textDiasMarc(){
+      if (diasMarc.length === 7){return('Todos os dias')}
+      else if(diasMarc.length > 0){return('A cada '+ diasMarc.join(', '))}
+      else{return('Não repetir')}
+    }
 
     const toggleDia = (id) => {
         setDias(dias.map(dia => 
@@ -38,21 +51,59 @@ export default function Home(){
                                value ={minuto}
                                placeholder="00"
                                onChangeText={(texto)=> setMinuto(texto)}
-                               keyboardType="numeric"
+                               
+                               
                                maxLength={2}
+                               
                     />
                 </View>
 
                 <View style={styles.container2}>
+                    <View style={styles.selectDays}>
+                      <Text style={styles.text}>{textDiasMarc()}</Text>
+                    </View>
                     <View style={styles.days}>
                         {dias.map((dia)=>{
-                                <TouchableOpacity key={dia.id} onPress={()=>toggleDia(dia.id)}>
-                                    <View style={[styles.day,{backgroundColor: dia.selecionado ? '#ACC1D3' : '#2E5077'}]}>
-                                        <Text style={styles.textDay}>{dia.letra}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            
+                            return(
+                              <TouchableOpacity key={dia.id} onPress={()=>toggleDia(dia.id)}>
+                                  <View style={[styles.day,{backgroundColor: dia.selecionado ? '#ACC1D3' : '#2E5077'}]}>
+                                      <Text style={[{color:dia.selecionado ? '#2E5077' : '#ACC1D3'},{fontWeight:'600'}]}>{dia.letra}</Text>
+                                  </View>
+                              </TouchableOpacity>
+                            )
                         })}
+                    </View>
+                    <View style={styles.alarmName}>
+                      <TextInput
+                               style={styles.text}
+                               value ={nomeAlarme}
+                               placeholder="Insira o nome do alarme"
+                               onChangeText={(texto)=> setnomeAlarme(texto)}
+                    />
+                    </View>
+                    <View style={styles.containerButtons}>
+                        <TouchableOpacity
+                          onPress={() => {
+                            if(hora > 23 || minuto > 59 || hora < 0 || minuto < 0 || hora ==='-0' || minuto === '-0'){
+                              console.log("Erro, horario inválida")
+                              return
+                            }
+                            router.push({
+                              pathname: "/", 
+                              params: { 
+                                novoTitulo: nomeAlarme || "Novo Alarme",
+                                novaHora: hora || "00",
+                                novoMin: minuto || "00",
+                                novaFreq: textDiasMarc() 
+                              }
+                            });
+                          }}>
+                          <View style={styles.button}><Text style={styles.textB}>Salvar</Text></View>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={()=>router.push("/")}>
+                          <View style={styles.button}><Text style={styles.textB}>Cancelar</Text></View>
+                        </TouchableOpacity>
+
                     </View>
                 </View>
                 
@@ -75,7 +126,9 @@ const styles = StyleSheet.create({
     color:'white',
     alignSelf:'center',
     marginTop:'40%',
-    marginBottom:'10%'
+    marginBottom:'10%',
+    color:'#ACC1D3',
+    fontWeight:'600'
   },
   time:{
     flexDirection:'row',
@@ -84,7 +137,7 @@ const styles = StyleSheet.create({
   },
   display: {
     color: '#ACC1D3',
-    fontSize: 50,
+    fontSize: 100,
     fontWeight: '500',
     letterSpacing: 2,
     letterSpacing: 3,
@@ -92,28 +145,60 @@ const styles = StyleSheet.create({
   },
   hour:{
     textAlign:'right',
-    width:65,
+    width:120,
   },
   min:{
     textAlign:'left',
-        width:65,
+        width:120,
   },
   container2:{
     backgroundColor:'#3D5F7E',
     marginTop:'40%',
     alignSelf:'center',
-    height:'60%',
+    height:'35%',
     width:'90%',
     borderRadius:45
   },
   days:{
-    flexDirection:'row'
+    flexDirection:'row',
+    justifyContent:'space-between',
+    marginHorizontal:20
   },
   day:{
-    height:50,
-    width:50
+    height:35,
+    width:35,
+    borderRadius:25,
+    alignItems:'center',
+    justifyContent:'center'
+
   },
-  textDay:{
-    color:'green'
-  }
+  selectDays:{
+    padding:'5%',
+    paddingLeft:'7%'
+  },
+  text:{
+    color:'#ACC1D3',
+    fontWeight:'600'
+  },
+  alarmName:{
+    paddingHorizontal:'5%',
+    marginVertical:'5%'
+  },
+  containerButtons:{
+    flexDirection:'row',
+    justifyContent:'space-around',
+    marginTop:'5%'
+  },
+  button:{
+    backgroundColor:'#ACC1D3',
+    height:30,
+    width:90,
+    borderRadius:15,
+    justifyContent:'center',
+    alignItems:'center'
+  },
+  textB:{
+    color:'#2E5077',
+    fontWeight:'600'
+  },
 })
